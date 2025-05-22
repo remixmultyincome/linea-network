@@ -576,7 +576,11 @@ export default function DashboardPage() {
           </tbody>
         </table>
       </div>
+      <div style={{ textAlign: "center", color: "#d4af37", fontWeight: 500, marginTop: 28, fontSize: 14 }}>
+        Smart Contract powered by Linea • Secure & Transparent
+      </div>
       <div style={{ height: 34 }}></div>
     </div>
   );
 }
+
