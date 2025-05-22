@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500&display=swap');
+/* ===== CSS RESET & ROOT VARIABLES ===== */
 :root {
   --navy: #0a1f44;
   --navy-dark: #05122b;
@@ -11,152 +11,190 @@
   --glass-border: rgba(255, 255, 255, 0.15);
   --glass-highlight: rgba(255, 255, 255, 0.2);
 }
-body {
-  font-family: 'Montserrat', Arial, sans-serif;
-  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
-  color: var(--neutral-light);
+
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== BASE STYLES ===== */
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark)) fixed;
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--neutral-light);
   min-height: 100vh;
+  width: 100vw;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  overflow-x: hidden;
 }
-.logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.7rem;
-  color: var(--gold);
-  font-weight: bold;
-  text-align: center;
-  letter-spacing: 2px;
-  margin: 2rem 0 1.5rem 0;
+
+body::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+  z-index: -1;
 }
+
+/* ===== LAYOUT STRUCTURE ===== */
 .container {
-  max-width: 700px;
+  width: 100%;
+  max-width: 500px;
   margin: 0 auto;
-  padding: 32px 8px 24px 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
+
+/* ===== CARD COMPONENT ===== */
 .card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
-  padding: 32px 28px 28px 28px;
-  margin-bottom: 28px;
+  border-radius: 16px;
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 25px;
+  width: 100%;
+  margin: 0;
 }
+
 .card-title {
-  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
   color: var(--gold);
-  font-size: 2rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 15px;
+  text-align: center;
 }
+
 .card-text {
-  font-size: 1.1rem;
+  margin-bottom: 15px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
   color: var(--neutral-light);
-  margin-bottom: 1.3rem;
+  font-family: inherit;
+  font-size: 0.95rem;
 }
-.wallet-info {
-  font-family: 'Montserrat', monospace;
-  color: var(--emerald);
-  background: var(--glass-highlight);
-  border-radius: 10px;
-  padding: 10px 18px;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--gold);
 }
+
+/* ===== BUTTONS ===== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
   border: none;
-  padding: 12px 24px;
+  padding: 14px 24px;
   border-radius: 50px;
   font-size: 1rem;
   font-weight: 500;
   color: var(--navy);
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.23);
-  margin: 12px 0 0 0;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
 }
+
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
 }
-.form-group {
-  margin-bottom: 1.5rem;
-}
-.form-label {
-  color: var(--gold);
-  font-weight: 500;
-  display: block;
-  margin-bottom: 6px;
-}
-.form-control {
-  width: 100%;
-  padding: 10px 16px;
-  font-size: 1rem;
-  border-radius: 8px;
+
+/* ===== UTILITY CLASSES ===== */
+.wallet-info {
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  background: var(--neutral-lighter);
-  color: var(--navy);
-  margin-bottom: 10px;
-  font-family: 'Montserrat', sans-serif;
-}
-.form-control:focus {
-  outline: 2px solid var(--gold);
-}
-.price-info {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  font-size: 1rem;
-  color: var(--gold);
-  margin-bottom: 1.1rem;
-}
-.price-value {
-  font-weight: 700;
-  color: var(--emerald);
-  font-size: 1.1rem;
-}
-.referral-section {
-  margin-top: 1.5rem;
-  padding: 14px 18px;
   border-radius: 12px;
-  background: var(--glass-highlight);
-  color: var(--neutral-light);
-  font-size: 1rem;
-  text-align: center;
-}
-.referral-link {
-  margin-top: 8px;
+  padding: 10px 16px;
   font-family: monospace;
+  font-size: 0.85rem;
   color: var(--emerald);
+  margin-bottom: 15px;
+  text-align: center;
   word-break: break-all;
 }
-.error-message {
-  color: #fa4343;
-  font-size: 1rem;
-  margin-top: 0.6rem;
-  min-height: 1.2em;
+
+.loading {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: var(--gold);
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
 }
-.success-message {
-  color: var(--emerald);
-  font-size: 1rem;
-  margin-top: 0.6rem;
-  min-height: 1.2em;
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
-@media (max-width: 600px) {
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
   .container {
-    padding: 6px;
+    max-width: 100%;
+    padding: 10px;
   }
+  
+  body {
+    padding: 0;
+  }
+  
   .card {
-    padding: 18px 6px 18px 6px;
+    padding: 20px;
   }
-  .logo {
-    font-size: 1.7rem;
-    margin: 1rem 0 0.9rem 0;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 15px;
   }
+  
   .card-title {
     font-size: 1.2rem;
+  }
+  
+  .btn {
+    padding: 12px 20px;
   }
 }

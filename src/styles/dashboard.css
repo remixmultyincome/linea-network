@@ -1,3 +1,4 @@
+/* ===== CSS RESET & ROOT VARIABLES ===== */
 :root {
   --navy: #0a1f44;
   --navy-dark: #05122b;
@@ -17,19 +18,28 @@
   box-sizing: border-box;
 }
 
-/* -------- Base Layout -------- */
+/* ===== BASE STYLES ===== */
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 body {
-  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark)) fixed;
+  background-attachment: fixed;
+  background-size: cover;
   font-family: 'Montserrat', sans-serif;
   color: var(--neutral-light);
   min-height: 100vh;
-  padding: 32px 0;
-  display: block;
-  overflow-x: hidden;
+  width: 100vw;
+  padding: 0;
+  margin: 0;
   position: relative;
+  overflow-x: hidden;
 }
 
-/* Nice radial effect */
 body::before {
   content: '';
   position: absolute;
@@ -41,25 +51,18 @@ body::before {
   z-index: -1;
 }
 
-/* Main content wrapper */
+/* ===== LAYOUT STRUCTURE ===== */
 .container {
-  max-width: 800px;     /* Wider on desktop */
   width: 100%;
+  max-width: 500px;
   margin: 0 auto;
-  /* You can add box-shadow if you want a floating effect */
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Logo style */
-.logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--gold);
-  text-align: center;
-  margin-bottom: 30px;
-  text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
-}
-
+/* ===== CARD COMPONENT ===== */
 .card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -67,24 +70,54 @@ body::before {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  padding: 30px;
-  margin-bottom: 18px;
-  transition: all 0.3s ease;
+  padding: 25px;
+  width: 100%;
+  margin: 0;
 }
 
 .card-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--gold);
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   text-align: center;
 }
 
 .card-text {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   line-height: 1.6;
+  font-size: 0.95rem;
 }
 
+/* ===== FORM ELEMENTS ===== */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--neutral-light);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* ===== BUTTONS ===== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -107,76 +140,61 @@ body::before {
   box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
 }
 
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.price-info {
+/* ===== UTILITY CLASSES ===== */
+.wallet-info {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 20px;
+  padding: 10px 16px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--emerald);
+  margin-bottom: 15px;
   text-align: center;
+  word-break: break-all;
 }
 
-.price-value {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--gold);
+.loading {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: var(--gold);
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
 }
 
-/* ----------- Responsive (Mobile) ----------- */
-@media (max-width: 600px) {
-  body {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    padding: 10px 0 !important;
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
   .container {
-    max-width: 100vw !important;
-    padding: 0 2vw !important;
+    max-width: 100%;
+    padding: 10px;
   }
+  
+  body {
+    padding: 0;
+  }
+  
   .card {
-    padding: 8px !important;
-    font-size: 0.92rem !important;
-    margin-bottom: 8px !important;
+    padding: 20px;
   }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 15px;
+  }
+  
   .card-title {
-    font-size: 1.05rem !important;
-    margin-bottom: 8px !important;
+    font-size: 1.2rem;
   }
-  .logo {
-    font-size: 1.1rem !important;
-    margin-bottom: 12px !important;
-  }
+  
   .btn {
-    font-size: 0.92rem !important;
-    padding: 8px 0 !important;
-    border-radius: 32px !important;
-  }
-  .price-info {
-    font-size: 0.9rem !important;
-    padding: 4px !important;
-  }
-}
-
-/* ----------- Make container wider on big screens (reduce empty sides) ----------- */
-@media (min-width: 1200px) {
-  .container {
-    max-width: 900px !important;
-  }
-}
-
-/* ----------- OPTIONAL: Remove bottom empty space even more ----------- */
-@media (min-width: 900px) {
-  body {
-    min-height: 0 !important;
-    padding-bottom: 24px !important;
-    align-items: flex-start !important;
-    display: block !important;
+    padding: 12px 20px;
   }
 }
