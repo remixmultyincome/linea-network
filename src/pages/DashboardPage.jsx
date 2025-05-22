@@ -1,5 +1,5 @@
 import "../styles/index.css";
-import "./dashboard.css";
+import "../styles/dashboard.css";
 import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { ethers, BrowserProvider } from 'ethers';
 import contractABI from '../contract-abi.json';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_MAIN_CONTRACT_ADDRESS;
-const POLYGONSCAN_API_KEY = "VFPV2DPHDG4QZVAIE3YI3Z88NYUSGG9T1C";
+const POLYGONSCAN_API_KEY = import.meta.env.VITE_POLYGONSCAN_API_KEY;
 
 const rankNames = [
   "Not Registered", "Bronze", "Silver", "Gold", "Platinum", "Diamond",
