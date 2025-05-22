@@ -180,3 +180,23 @@ body::before {
     display: block !important;
   }
 }
+@media (max-width: 600px) {
+  .container, .dashboard-cards {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .card {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 auto !important;
+    padding: 12px 4px !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important
