@@ -1,4 +1,3 @@
-/* ===== MOBILE STACKING SOLUTION (1 CARD PER ROW) ===== */
 :root {
   --navy: #0a1f44;
   --navy-dark: #05122b;
@@ -18,28 +17,49 @@
   box-sizing: border-box;
 }
 
-/* Base Styles for All Devices */
+/* -------- Base Layout -------- */
 body {
-  background: linear-gradient(135deg, var(--navy), var(--navy-dark)) fixed;
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
   font-family: 'Montserrat', sans-serif;
   color: var(--neutral-light);
   min-height: 100vh;
-  padding: 15px;
-  width: 100vw;
+  padding: 32px 0;
+  display: block;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* Nice radial effect */
+body::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+  z-index: -1;
 }
 
 /* Main content wrapper */
 .container {
-  width: 100vw;
-  max-width: 100vw;
+  max-width: 800px;     /* Wider on desktop */
+  width: 100%;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  /* You can add box-shadow if you want a floating effect */
 }
 
-/* Card: Always full width and stacked vertically */
+/* Logo style */
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+}
+
 .card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -47,60 +67,137 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  padding: 18px;
-  width: 100vw;
-  min-width: 100vw;
-  max-width: 100vw;
-  margin: 0 auto;
+  padding: 30px;
+  margin-bottom: 18px;
   transition: all 0.3s ease;
-  box-sizing: border-box;
 }
 
-/* --------- Responsive Layouts --------- */
-
-/* Desktop: Center container, add max-width and spacing */
-@media (min-width: 768px) {
-  body {
-    padding: 32px;
-  }
-  .container {
-    max-width: 800px;
-    width: 100%;
-    gap: 20px;
-  }
-  .card {
-    padding: 25px;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-/* Tablet: Slightly smaller container */
-@media (min-width: 601px) and (max-width: 767px) {
-  .container {
-    max-width: 95vw;
-    width: 95vw;
-  }
+.card-text {
+  margin-bottom: 20px;
+  line-height: 1.6;
 }
 
-/* Mobile: Super compact, edge-to-edge, stacked cards */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  padding: 14px 24px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--navy);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.price-info {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.price-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* ----------- Responsive (Mobile) ----------- */
 @media (max-width: 600px) {
   body {
-    padding: 8px;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 10px 0 !important;
   }
   .container {
-    gap: 8px;
-    width: 100vw;
-    max-width: 100vw;
+    max-width: 100vw !important;
+    padding: 0 2vw !important;
   }
   .card {
-    padding: 12px;
-    width: 100vw;
-    min-width: 100vw;
-    max-width: 100vw;
-    border-radius: 12px;
-    font-size: 0.96rem;
-    box-sizing: border-box;
+    padding: 8px !important;
+    font-size: 0.92rem !important;
+    margin-bottom: 8px !important;
+  }
+  .card-title {
+    font-size: 1.05rem !important;
+    margin-bottom: 8px !important;
+  }
+  .logo {
+    font-size: 1.1rem !important;
+    margin-bottom: 12px !important;
+  }
+  .btn {
+    font-size: 0.92rem !important;
+    padding: 8px 0 !important;
+    border-radius: 32px !important;
+  }
+  .price-info {
+    font-size: 0.9rem !important;
+    padding: 4px !important;
   }
 }
+
+/* ----------- Make container wider on big screens (reduce empty sides) ----------- */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 900px !important;
+  }
+}
+
+/* ----------- OPTIONAL: Remove bottom empty space even more ----------- */
+@media (min-width: 900px) {
+  body {
+    min-height: 0 !important;
+    padding-bottom: 24px !important;
+    align-items: flex-start !important;
+    display: block !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .container, .dashboard-cards {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .card {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 auto !important;
+    padding: 12px 4px !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important
