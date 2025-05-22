@@ -9,6 +9,23 @@ import { useNavigate } from "react-router-dom";
 const CONTRACT_ADDRESS = import.meta.env.VITE_MAIN_CONTRACT_ADDRESS;
 const DEPLOYER_WALLET = import.meta.env.VITE_DEPLOYER_WALLET;
 
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+{isMobile && (
+  <div style={{
+    background:'#FFD700',
+    color:'#222',
+    padding:'10px 14px',
+    textAlign:'center',
+    fontWeight:'bold',
+    borderRadius:'10px',
+    margin:'12px 0'
+  }}>
+    For the best wallet experience, open this DApp in your crypto wallet’s built-in browser (Trust Wallet, SafePal, MetaMask Mobile, etc).
+  </div>
+)}
+
+
 export default function IndexPage() {
   const { open } = useWeb3Modal();
   const { address, isConnected } = useAccount();
