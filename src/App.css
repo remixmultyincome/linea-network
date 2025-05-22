@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500&display=swap');
+:root {
+  --navy: #0a1f44;
+  --navy-dark: #05122b;
+  --gold: #d4af37;
+  --gold-light: #e8c874;
+  --emerald: #50c878;
+  --neutral-light: #f4f4f9;
+  --neutral-lighter: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-highlight: rgba(255, 255, 255, 0.2);
+}
+body {
+  font-family: 'Montserrat', Arial, sans-serif;
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  color: var(--neutral-light);
+  margin: 0;
+  min-height: 100vh;
+}
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.7rem;
+  color: var(--gold);
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 2px;
+  margin: 2rem 0 1.5rem 0;
+}
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 32px 8px 24px 8px;
+}
+.card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+  padding: 32px 28px 28px 28px;
+  margin-bottom: 28px;
+  backdrop-filter: blur(20px);
+}
+.card-title {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  font-size: 2rem;
+  margin-bottom: 0.7rem;
+}
+.card-text {
+  font-size: 1.1rem;
+  color: var(--neutral-light);
+  margin-bottom: 1.3rem;
+}
+.wallet-info {
+  font-family: 'Montserrat', monospace;
+  color: var(--emerald);
+  background: var(--glass-highlight);
+  border-radius: 10px;
+  padding: 10px 18px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--navy);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.23);
+  margin: 12px 0 0 0;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+}
+.form-group {
+  margin-bottom: 1.5rem;
+}
+.form-label {
+  color: var(--gold);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+}
+.form-control {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: var(--neutral-lighter);
+  color: var(--navy);
+  margin-bottom: 10px;
+  font-family: 'Montserrat', sans-serif;
+}
+.form-control:focus {
+  outline: 2px solid var(--gold);
+}
+.price-info {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 1rem;
+  color: var(--gold);
+  margin-bottom: 1.1rem;
+}
+.price-value {
+  font-weight: 700;
+  color: var(--emerald);
+  font-size: 1.1rem;
+}
+.referral-section {
+  margin-top: 1.5rem;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--glass-highlight);
+  color: var(--neutral-light);
+  font-size: 1rem;
+  text-align: center;
+}
+.referral-link {
+  margin-top: 8px;
+  font-family: monospace;
+  color: var(--emerald);
+  word-break: break-all;
+}
+.error-message {
+  color: #fa4343;
+  font-size: 1rem;
+  margin-top: 0.6rem;
+  min-height: 1.2em;
+}
+.success-message {
+  color: var(--emerald);
+  font-size: 1rem;
+  margin-top: 0.6rem;
+  min-height: 1.2em;
+}
+@media (max-width: 600px) {
+  .container {
+    padding: 6px;
+  }
+  .card {
+    padding: 18px 6px 18px 6px;
+  }
+  .logo {
+    font-size: 1.7rem;
+    margin: 1rem 0 0.9rem 0;
+  }
+  .card-title {
+    font-size: 1.2rem;
+  }
+}
