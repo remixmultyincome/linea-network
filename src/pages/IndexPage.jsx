@@ -1,4 +1,4 @@
-import "../styles/index.css";
+import "../styles/App.css";
 import React, { useEffect, useState } from "react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useAccount, useConnect } from "wagmi";
@@ -55,7 +55,7 @@ export default function IndexPage() {
         navigate("/dashboard");
       } catch (err) {
         // Show friendly error
-        setRegError("Registration failed. Please try again or check your wallet balance.");
+        setRegError("Registration failed. Please try again, check your chain and your wallet balance!");
         console.error("Registration error:", err);
       }
       setLoading(false);

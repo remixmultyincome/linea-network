@@ -304,7 +304,7 @@ export default function DashboardPage() {
         {downlines.length === 0 ? (
           <div style={{ color: "#e8c874", marginBottom: 12 }}>No downlines found</div>
         ) : (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "9px 14px", marginBottom: 20 }}>
+          <div className="stats-cards" style={{ display: "flex", flexWrap: "wrap", gap: "9px 14px", marginBottom: 20 }}>
             {downlines.map((addr, idx) => (
               <div key={idx} style={{
                 background: "#0a1f44",
