@@ -66,7 +66,6 @@ async function getTxDate(blockNumber) {
   }
 }
 
-
 async function fetchRecentActivity(setTransactions, contractABI, contractAddress) {
   const iface = new ethers.Interface(contractABI);
   const logs = await fetchRecentEvents(contractAddress);
@@ -583,4 +582,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
