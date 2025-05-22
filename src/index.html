@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0a1f44" />
+    <meta name="description" content="Linea Network Application - Secure Web3 Dashboard" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <title>Linea - Network | DEccentralizing Wealth</title>
+    
+    <!-- Preconnect to important origins -->
+    <link rel="preconnect" href="https://polygon-rpc.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    
+    <!-- Font preloading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" as="style" />
+    
+    <style>
+      /* Critical CSS for initial loading */
+      body {
+        margin: 0;
+        background: linear-gradient(135deg, #0a1f44, #05122b);
+        font-family: 'Montserrat', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Load fonts after critical content -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  </body>
+</html>

@@ -21,34 +21,39 @@
 /* ===== BASE STYLES ===== */
 html {
   height: 100%;
-  margin: 0;
-  padding: 0;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: linear-gradient(135deg, var(--navy), var(--navy-dark)) fixed;
-  background-attachment: fixed;
-  background-size: cover;
-  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--neutral-light);
   min-height: 100vh;
-  width: 100vw;
-  padding: 0;
-  margin: 0;
+  width: 100%;
   position: relative;
-  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 body::before {
   content: '';
-  position: absolute;
+  position: fixed;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
   background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
   z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== REACT ROOT CONTAINER ===== */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 /* ===== LAYOUT STRUCTURE ===== */
@@ -56,10 +61,8 @@ body::before {
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  padding: 20px 15px;
+  flex: 1;
 }
 
 /* ===== CARD COMPONENT ===== */
@@ -72,7 +75,17 @@ body::before {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   padding: 25px;
   width: 100%;
-  margin: 0;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:last-child {
+  margin-bottom: 0;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .card-title {
@@ -85,13 +98,12 @@ body::before {
 
 .card-text {
   margin-bottom: 15px;
-  line-height: 1.6;
   font-size: 0.95rem;
 }
 
 /* ===== FORM ELEMENTS ===== */
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .form-label {
@@ -109,12 +121,18 @@ body::before {
   border-radius: 8px;
   color: var(--neutral-light);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
 }
 
 /* ===== BUTTONS ===== */
@@ -128,11 +146,13 @@ body::before {
   padding: 14px 24px;
   border-radius: 50px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--navy);
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 .btn:hover {
@@ -140,28 +160,39 @@ body::before {
   box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
 }
 
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
 /* ===== UTILITY CLASSES ===== */
 .wallet-info {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  padding: 10px 16px;
-  font-family: monospace;
+  padding: 12px 16px;
+  font-family: 'Roboto Mono', monospace;
   font-size: 0.85rem;
   color: var(--emerald);
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   text-align: center;
   word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .loading {
   display: inline-block;
   width: 18px;
   height: 18px;
-  border: 3px solid rgba(255,255,255,.3);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   border-top-color: var(--gold);
-  animation: spin 1s ease-in-out infinite;
+  animation: spin 1s linear infinite;
   margin-right: 8px;
 }
 
@@ -169,32 +200,51 @@ body::before {
   to { transform: rotate(360deg); }
 }
 
+.error-message {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.success-message {
+  color: var(--emerald);
+  font-size: 0.9rem;
+  margin-top: 8px;
+  text-align: center;
+}
+
 /* ===== MOBILE RESPONSIVENESS ===== */
 @media (max-width: 768px) {
   .container {
-    max-width: 100%;
-    padding: 10px;
-  }
-  
-  body {
-    padding: 0;
+    padding: 15px;
   }
   
   .card {
     padding: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .card {
-    padding: 15px;
+    margin-bottom: 15px;
   }
   
   .card-title {
     font-size: 1.2rem;
   }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+  
+  .card {
+    padding: 18px;
+    margin-bottom: 12px;
+  }
   
   .btn {
     padding: 12px 20px;
+  }
+  
+  .form-control {
+    padding: 10px 14px;
   }
 }
