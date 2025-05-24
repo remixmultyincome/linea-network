@@ -1,32 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { WagmiConfig, createConfig, configureChains } from 'wagmi';
-import { polygon } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
-import { createWeb3Modal } from '@web3modal/wagmi/react';
-import App from './App';
-import './App.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { WagmiConfig, createConfig, http } from "wagmi";
+import { polygon } from "wagmi/chains";
+import { createWeb3Modal } from "@web3modal/wagmi/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import App from "./App";
+import "./App.css";
 
 const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
 
-const { chains, publicClient } = configureChains([polygon], [publicProvider()]);
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  publicClient,
+const config = createConfig({
+  chains: [polygon],
+  transports: {
+    [polygon.id]: http(),
+  },
+  ssr: false,
 });
 
 createWeb3Modal({
-  wagmiConfig,
+  wagmiConfig: config,
   projectId,
-  chains,
-  enableOnNonInjectedDevices: true
+  chains: [polygon],
+  enableOnNonInjectedDevices: true,
 });
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const queryClient = new QueryClient();
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <WagmiConfig config={wagmiConfig}>
-      <App />
-    </WagmiConfig>
+    <QueryClientProvider client={queryClient}>
+      <WagmiConfig config={config}>
+        <App />
+      </WagmiConfig>
+    </QueryClientProvider>
   </React.StrictMode>
 );

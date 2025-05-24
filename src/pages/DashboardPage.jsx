@@ -1,29 +1,32 @@
-import "../styles/index.css";
 import "../styles/dashboard.css";
-import React, { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useAccount, useDisconnect } from 'wagmi';
+import { ethers } from 'ethers';
 import { useNavigate } from 'react-router-dom';
-import { ethers, BrowserProvider } from 'ethers';
 import contractABI from '../contract-abi.json';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_MAIN_CONTRACT_ADDRESS;
 const POLYGONSCAN_API_KEY = import.meta.env.VITE_POLYGONSCAN_API_KEY;
+
+const POLYGON_RPC_ENDPOINTS = [
+  "https://polygon-rpc.com",
+  "https://rpc-mainnet.maticvigil.com",
+  "https://rpc.ankr.com/polygon",
+  "https://polygon-bor.publicnode.com"
+];
 
 const rankNames = [
   "Not Registered", "Bronze", "Silver", "Gold", "Platinum", "Diamond",
   "Ruby", "Emerald", "Sapphire", "Elite", "Royal", "Legend", "Mythic"
 ];
 
-// ---- POLYGONSCAN EVENT FETCH UTILS ----
 async function fetchRecentEvents(contractAddress) {
-  // Get latest block number
   const latestBlock = await fetch(
     `https://api.polygonscan.com/api?module=proxy&action=eth_blockNumber&apikey=${POLYGONSCAN_API_KEY}`
   ).then(res => res.json())
    .then(data => parseInt(data.result, 16));
   const fromBlock = Math.max(latestBlock - 10000, 0);
 
-  // Event topics
   const eventTopics = [
     ethers.id("BonusEarned(address,address,uint256,string)"),
     ethers.id("Withdrawal(address,uint256)"),
@@ -31,7 +34,6 @@ async function fetchRecentEvents(contractAddress) {
     ethers.id("RankUpgraded(address,uint256)")
   ];
 
-  // Fetch logs from Polygonscan
   const logs = [];
   for (let topic of eventTopics) {
     const url = `https://api.polygonscan.com/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=latest&address=${contractAddress}&topic0=${topic}&apikey=${POLYGONSCAN_API_KEY}`;
@@ -40,12 +42,11 @@ async function fetchRecentEvents(contractAddress) {
     if (json.result && Array.isArray(json.result)) logs.push(...json.result);
   }
   logs.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber));
-  return logs.slice(0, 15); // Return the latest 15 logs
+  return logs.slice(0, 15);
 }
 
 async function getTxDate(blockNumber) {
   try {
-    // Ensure blockNumber is decimal, convert if hex string
     const blockNo = typeof blockNumber === "string" && blockNumber.startsWith("0x")
       ? parseInt(blockNumber, 16)
       : Number(blockNumber);
@@ -57,11 +58,8 @@ async function getTxDate(blockNumber) {
       const ts = Number(json.result.timeStamp) * 1000;
       return new Date(ts).toLocaleString();
     }
-    // Debug info if failed
-    console.warn("No timestamp found for block", blockNo, json);
     return "Unknown Date";
   } catch (err) {
-    console.error("Failed to fetch date for block", blockNumber, err);
     return "Unknown Date";
   }
 }
@@ -77,8 +75,6 @@ async function fetchRecentActivity(setTransactions, contractABI, contractAddress
         type = parsed.name;
         if (parsed.name === "BonusEarned" || parsed.name === "Withdrawal") {
           amount = ethers.formatEther(parsed.args.amount) + " MATIC";
-        } else {
-          amount = "-";
         }
         date = await getTxDate(log.blockNumber);
       } catch {}
@@ -88,8 +84,26 @@ async function fetchRecentActivity(setTransactions, contractABI, contractAddress
   setTransactions(events);
 }
 
+async function getProvider() {
+  if (window.ethereum) {
+    return new ethers.BrowserProvider(window.ethereum);
+  }
+
+  for (const endpoint of POLYGON_RPC_ENDPOINTS) {
+    try {
+      const provider = new ethers.JsonRpcProvider(endpoint);
+      await provider.getBlockNumber();
+      return provider;
+    } catch (err) {
+      console.warn(`RPC endpoint ${endpoint} failed, trying next...`);
+    }
+  }
+  throw new Error("All Polygon RPC endpoints failed");
+}
+
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [walletInfo, setWalletInfo] = useState({});
@@ -103,43 +117,96 @@ export default function DashboardPage() {
   const [downlines, setDownlines] = useState([]);
   const [directReferrals, setDirectReferrals] = useState([]);
   const [nextRankCost, setNextRankCost] = useState("0");
+  const [networkError, setNetworkError] = useState("");
+  const [inactiveTimer, setInactiveTimer] = useState(null);
 
-  // Helper to shorten addresses
-  const shortAddr = addr => addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : "-";
+  const resetInactivityTimer = useCallback(() => {
+    if (inactiveTimer) clearTimeout(inactiveTimer);
+    const timer = setTimeout(() => {
+      disconnect();
+      navigate('/');
+    }, 10 * 60 * 1000);
+    setInactiveTimer(timer);
+  }, [inactiveTimer, disconnect, navigate]);
 
   useEffect(() => {
-    async function verifyAndLoad() {
-      if (!isConnected || !address) {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, resetInactivityTimer);
+    });
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+      if (inactiveTimer) clearTimeout(inactiveTimer);
+    };
+  }, [resetInactivityTimer, inactiveTimer]);
+
+  const shortAddr = addr => addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : "-";
+
+  const refreshData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const provider = await getProvider();
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+
+      await Promise.all([
+        loadContractStats(contract),
+        loadWalletInfo(contract),
+        fetchMaticPrice(),
+        fetchRecentActivity(setTransactions, contractABI, CONTRACT_ADDRESS),
+        loadDirectReferrals(contract),
+        loadNextRankCost(contract)
+      ]);
+    } catch (err) {
+      console.error('Refresh error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ... (rest of the component implementation continues below)
+
+  async function verifyAndLoad() {
+    if (!isConnected || !address) {
+      navigate('/');
+      return;
+    }
+    
+    try {
+      const provider = await getProvider();
+      
+      // Network check
+      const network = await provider.getNetwork();
+      
+      if (network.chainId !== 137n) {
+        setNetworkError("Please switch to Polygon network (ChainID: 137)");
+        setLoading(false);
+        return;
+      }
+      
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+
+      const isRegistered = await contract.isUserRegistered(address).catch(() => false);
+      
+      if (!isRegistered) {
         navigate('/');
         return;
       }
-      try {
-        const provider = new BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
 
-        const isRegistered = await contract.isUserRegistered(address);
-        if (!isRegistered) {
-          navigate('/');
-          return;
-        }
-
-        setReferralLink(`${window.location.origin}?ref=${address}`);
-        await Promise.all([
-          loadContractStats(contract),
-          loadWalletInfo(contract),
-          fetchMaticPrice(),
-          fetchRecentActivity(setTransactions, contractABI, CONTRACT_ADDRESS),
-          loadDirectReferrals(contract),
-          loadNextRankCost(contract)
-        ]);
-        setLoading(false);
-      } catch (err) {
-        navigate('/');
-      }
+      setReferralLink(`${window.location.origin}?ref=${address}`);
+      await refreshData();
+    } catch (err) {
+      console.error('Dashboard loading error:', err);
+      navigate('/');
     }
+  }
+
+  useEffect(() => {
+    resetInactivityTimer(); // Start timer on initial load
     verifyAndLoad();
-    // eslint-disable-next-line
   }, [isConnected, address]);
 
   async function loadNextRankCost(contract) {
@@ -162,7 +229,9 @@ export default function DashboardPage() {
         totalRanks: stats.totalRanks.toString(),
         totalUsers: totalUsers.toString()
       });
-    } catch (err) {}
+    } catch (err) {
+      console.error('Error loading contract stats:', err);
+    }
   }
 
   async function loadWalletInfo(contract) {
@@ -187,7 +256,9 @@ export default function DashboardPage() {
         const price = await contract.getUpgradeCost(address);
         setNextRankCost(ethers.formatEther(price));
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error('Error loading wallet info:', err);
+    }
   }
 
   async function fetchMaticPrice() {
@@ -195,7 +266,9 @@ export default function DashboardPage() {
       const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd');
       const data = await res.json();
       setMaticPrice(data['matic-network'].usd);
-    } catch (err) {}
+    } catch (err) {
+      console.error('Error fetching MATIC price:', err);
+    }
   }
 
   async function loadDirectReferrals(contract) {
@@ -203,14 +276,16 @@ export default function DashboardPage() {
       let referrals = await contract.getReferrals(address);
       if (!Array.isArray(referrals)) referrals = [];
       setDirectReferrals(referrals.slice(0, 3));
-    } catch (err) {}
+    } catch (err) {
+      console.error('Error loading referrals:', err);
+    }
   }
 
   // Button Handlers
   const handleWithdraw = async () => {
     setActionLoading(true);
     try {
-      const provider = new BrowserProvider(window.ethereum);
+      const provider = await getProvider();
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
       const tx = await contract.withdraw();
@@ -226,7 +301,7 @@ export default function DashboardPage() {
   const handleUpgradeRank = async () => {
     setActionLoading(true);
     try {
-      const provider = new BrowserProvider(window.ethereum);
+      const provider = await getProvider();
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
       const price = await contract.getUpgradeCost(address);
@@ -244,7 +319,7 @@ export default function DashboardPage() {
     setShowDownlines(true);
     setDownlines([]);
     try {
-      const provider = new BrowserProvider(window.ethereum);
+      const provider = await getProvider();
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
       const result = await contract.getPlacementLine(address, 15);
@@ -304,7 +379,7 @@ export default function DashboardPage() {
         {downlines.length === 0 ? (
           <div style={{ color: "#e8c874", marginBottom: 12 }}>No downlines found</div>
         ) : (
-          <div className="stats-cards" style={{ display: "flex", flexWrap: "wrap", gap: "9px 14px", marginBottom: 20 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "9px 14px", marginBottom: 20 }}>
             {downlines.map((addr, idx) => (
               <div key={idx} style={{
                 background: "#0a1f44",
@@ -337,10 +412,74 @@ export default function DashboardPage() {
     </div>
   );
 
-  if (loading) return <div className="wallet-info">Loading Dashboard...</div>;
+  if (loading) {
+    return (
+      <div className="wallet-info" style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh',
+        color: '#d4af37'
+      }}>
+        <div>Loading Dashboard...</div>
+        {networkError && (
+          <div style={{ 
+            marginTop: '20px', 
+            color: '#ff6b6b', 
+            padding: '10px', 
+            background: '#0a1f44',
+            borderRadius: '8px'
+          }}>
+            {networkError}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="container" style={{ maxWidth: 1200, margin: '32px auto', padding: 0 }}>
+      {/* Top Right Controls */}
+      <div style={{
+        position: 'fixed',
+        top: 20,
+        right: 20,
+        display: 'flex',
+        gap: '10px',
+        zIndex: 1000
+      }}>
+        <button
+          onClick={refreshData}
+          style={{
+            background: '#12254b',
+            color: '#50c878',
+            border: '1px solid #50c878',
+            borderRadius: '20px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontWeight: 600
+          }}
+          disabled={actionLoading}
+        >
+          {actionLoading ? 'Refreshing...' : 'Refresh Data'}
+        </button>
+        <button
+          onClick={() => disconnect()}
+          style={{
+            background: '#12254b',
+            color: '#ff6b6b',
+            border: '1px solid #ff6b6b',
+            borderRadius: '20px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontWeight: 600
+          }}
+        >
+          Disconnect
+        </button>
+      </div>
+
       {showDownlines && <DownlineModal />}
       <div className="logo" style={{ marginBottom: 0 }}>
         <span style={{ fontFamily: "'Playfair Display',serif", color: "#d4af37", fontWeight: 700, fontSize: '2rem' }}>
